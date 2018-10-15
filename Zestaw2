@@ -1,0 +1,82 @@
+/* Zad2.10
+
+line = "Tutaj sa trzy biale znaki"
+print line
+line.split()
+print line.split()
+print "Liczba czarnych znakow w napisie:" 
+print len(line.split())
+
+/* Zad2.11
+
+word = "słowo"
+print word
+charsinword = [char for char in word]
+print charsinword
+result = "_".join(charsinword)
+print result
+
+/* Zad2.12
+
+line = "one two three four five"
+print line
+print line.split()
+first = [word[0] for word in line.split()]
+last = [word[-1] for word in line.split()]
+print "Napis z pierwszych znakow wyrazow z wiersza line:"
+print first
+print "Napis z ostatnich znakow wyrazow z wiersza line:"
+print last
+
+/* Zad2.13
+
+line = "pewien napis line"
+print line
+print sum(len(x) for x in line.split())
+
+/* Zad2.14
+
+line = "Zdanie z wieloma wyrazami"
+print line
+print "Najdluzszy wyraz:"
+print max(line.split(), key=len)
+print "Dlugosc:"
+print max(len(x) for x in line.split())
+
+/* Zad2.15
+
+L = [1,2,3,4,5,6]
+napis = ''.join(str(x) for x in L)
+print napis
+
+/* Zad2.16
+
+line = "GvR is a Dutch programmer who is best known as the author of the Python programming language."
+print line
+print line.replace("GvR", "Guido van Rossum")
+
+/* Zad2.17
+
+line = "zero jeden dwa trzy cztery piec szesc"
+print line
+list = line.split()
+print list
+print sorted(list, key=str.lower)
+print sorted(list, key=len)
+
+/* Zad2.18
+
+X = 1000100101671
+intline = [int(x) for x in str(X)]
+word = ''.join(str(x) for x in intline)
+print word
+line = [char for char in word]
+print "Ilosc cyfr zero w liczbie:"
+print line.count("0")
+
+/* Zad2.19
+
+L = [1,23,356,35,906,3]
+list = [str(x) for x in L]
+print list
+print [word.zfill(3) for word in list]
