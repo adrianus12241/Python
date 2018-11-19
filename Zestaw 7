@@ -1,0 +1,418 @@
+circles
+
+from points import Point
+from math import pi
+from math import sqrt
+
+class Circle:
+    """Klasa reprezentujaca okregi na plaszczyznie."""
+
+    def __init__(self, x=0, y=0, radius=1):
+        if(radius < 0):
+            raise ValueError("promien ujemny")
+        self.pt = Point(x, y)
+        self.radius = radius
+
+    def __repr__(self):        # "Circle(x, y, radius)"
+        return "Circle({},{},{})".format(self.pt.x,self.pt.y,self.radius)
+
+    def __eq__(self, other):
+        return self.pt == other.pt and self.radius == other.radius
+
+    def __ne__(self, other):
+        return not self == other
+
+    def area(self):           # pole powierzchni
+        return pi*(self.radius*self.radius)
+
+    def move(self, x, y):      # przesuniecie o (x, y)
+        ix = self.pt.x + x
+        iy = self.pt.y + y
+        return Circle(ix,iy,self.radius)
+
+    def cover(self, other):   # okrag pokrywajacy oba
+        midx = (float(self.pt.x) + float(other.pt.x))/2
+        midy = (float(self.pt.y) + float(other.pt.y))/2
+        if(self.radius>other.radius):
+            radtemp = self
+        elif(self.radius==other.radius):
+            radtemp = self
+        else:
+            radtemp = other
+        distance = sqrt((radtemp.pt.x-midx)*(radtemp.pt.x-midx)+(radtemp.pt.y-midy)*(radtemp.pt.y-midy))
+        rad = distance + radtemp.radius
+        radi = round(rad,2)
+        return Circle(midx,midy,radi)
+
+# Kod testujacy modul.
+
+import unittest
+class TestCircle(unittest.TestCase):
+
+    def setUp(self):
+        self.zero = Circle(0,0,0)
+
+    def test_print(self):
+        self.assertEqual(repr(Circle(1,2,3)),"Circle(1,2,3)")
+
+    def test_eq(self):
+        self.assertTrue(Circle(0,0,0)==Circle(0,0,0))
+        self.assertFalse(Circle(0,0,0)==Circle(1,2,3))
+
+    def test_ne(self):
+        self.assertTrue(Circle(0,0,0)!=Circle(1,2,3))
+        self.assertFalse(Circle(0,0,0)!=Circle(0,0,0))
+
+    def test_area(self):
+        self.assertEqual(Circle(0,0,4).area(),pi*4*4)
+
+    def test_move(self):
+        self.assertEqual(Circle(1,2,3).move(2,1),Circle(3,3,3))
+
+    def test_cover(self):
+        self.assertEqual(Circle(2,2,4).cover(Circle(0,0,9)),Circle(1.0,1.0,10.41))
+
+
+if __name__ == "__main__":
+    unittest.main()     # wszystkie testy
+
+--------------------------------------------------------------
+
+points
+
+from math import sqrt
+class Point:
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+       
+    def __str__(self):    
+        return "(%s, %s)" % (self.x, self.y)
+       
+    def __repr__(self):      
+        return "Point(%s, %s)" % (self.x, self.y)
+       
+    def __eq__(self, other):  
+        if self.x == other.x and self.y == other.y:
+            return True
+        else:
+            return False
+           
+    def __ne__(self, other):
+        return not self == other
+   
+    def __add__(self, other):
+        return Point(self.x+other.x, self.y+other.y)
+       
+    def __sub__(self, other):
+        return Point(self.x-other.x, self.y-other.y)
+       
+    def __mul__(self, other):
+        return self.x*other.x + self.y*other.y
+       
+    def cross(self, other):  
+        return self.x * other.y - self.y * other.x
+       
+    def length(self):        
+        return sqrt(self.x*self.x+self.y*self.y)
+        
+  -------------------------------------------------
+        
+fracs
+
+class Frac:
+    """Klasa reprezentujaca ulamek."""
+
+    def __init__(self, x=0, y=1):
+        if (y == 0):
+            raise ValueError("ZeroDivisionError");
+        self.x = x
+        self.y = y
+
+    def __str__(self):          # zwraca "x/y" lub "x" dla y=1
+        if(self.x % self.y == 0):
+            intr = self.x/self.y
+            return "{}".format(intr)
+        else:
+            return "{}/{}".format(self.x,self.y)
+
+    def __repr__(self):         # zwraca "Frac(x, y)"
+        return "Frac({},{})".format(self.x,self.y)
+
+    def __cmp__(self, other):     # cmp(frac1, frac2)
+        from fractions import gcd
+        nwd = gcd(self.y,other.y)
+        count1 = self.y/nwd
+        count2 = other.y/nwd
+        numerator1 = self.x*count2
+        numerator2 = other.x*count1
+        if(numerator1<numerator2):
+            return -1
+        elif(numerator1==numerator2):
+            return 0
+        else:
+            return 1
+
+    def __add__(self, other):   # frac1 + frac2, frac+int
+        try:
+            if (isinstance(other,int)==True or isinstance(other,float)==True):
+                raise TypeError
+            from fractions import gcd
+            nwd = gcd(self.y,other.y)
+            count1 = self.y/nwd
+            count2 = other.y/nwd
+            numerator1 = self.x*count2
+            numerator2 = other.x*count1
+            denom = self.y*count2
+            num = numerator1 + numerator2
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+        except TypeError:
+            from fractions import gcd
+            if(isinstance(other,float)==True):
+                TEMP = Frac(other.as_integer_ratio()[0],other.as_integer_ratio()[1])
+            else:
+                TEMP = Frac(other,1)
+            nwd = gcd(self.y,TEMP.y)
+            count1 = self.y/nwd
+            count2 = TEMP.y/nwd
+            numerator1 = self.x*count2
+            numerator2 = TEMP.x*count1
+            denom = self.y*count2
+            num = numerator1 + numerator2
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+
+    __radd__ = __add__              # int+frac
+
+    def __sub__(self, other):    # frac1 - frac2, frac-int
+        try:
+            if (isinstance(other,int)==True or isinstance(other,float)==True):
+                raise TypeError
+            from fractions import gcd
+            nwd = gcd(self.y,other.y)
+            count1 = self.y/nwd
+            count2 = other.y/nwd
+            numerator1 = self.x*count2
+            numerator2 = other.x*count1
+            denom = self.y*count2
+            num = numerator1 - numerator2
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+        except TypeError:
+            from fractions import gcd
+            if(isinstance(other,float)==True):
+                TEMP = Frac(other.as_integer_ratio()[0],other.as_integer_ratio()[1])
+            else:
+                TEMP = Frac(other,1)
+            nwd = gcd(self.y,TEMP.y)
+            count1 = self.y/nwd
+            count2 = TEMP.y/nwd
+            numerator1 = self.x*count2
+            numerator2 = TEMP.x*count1
+            denom = self.y*count2
+            num = numerator1 - numerator2
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+
+    def __rsub__(self, other):      # int-frac
+        from fractions import gcd
+        if(isinstance(other,float)==True):
+            TEMP = Frac(other.as_integer_ratio()[0],other.as_integer_ratio()[1])
+        else:
+            TEMP = Frac(other,1)
+        nwd = gcd(self.y,TEMP.y)
+        count1 = TEMP.y/nwd
+        count2 = self.y/nwd
+        numerator1 = TEMP.x*count2
+        numerator2 = self.x*count1
+        denom = TEMP.y*count2
+        num = numerator1 - numerator2
+        divisor = gcd(num,denom)
+        numerator = num/divisor
+        denominator = denom/divisor
+        if(numerator % denominator == 0):
+            intr = numerator/denominator
+            return Frac(intr,1)
+        else: 
+            return Frac(numerator,denominator)
+        
+    def __mul__(self, other):    # frac1 * frac2, frac*int
+        try:
+            if (isinstance(other,int)==True or isinstance(other,float)==True):
+                raise TypeError
+            from fractions import gcd
+            num = self.x*other.x
+            denom = self.y*other.y
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+        except TypeError:
+            from fractions import gcd
+            if(isinstance(other,float)==True):
+                TEMP = Frac(other.as_integer_ratio()[0],other.as_integer_ratio()[1])
+            else:
+                TEMP = Frac(other,1)
+            num = self.x*TEMP.x
+            denom = self.y*TEMP.y
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+
+    __rmul__ = __mul__    # int*frac
+
+    def __div__(self, other):    # frac1 / frac2, frac/int
+        try:
+            if (isinstance(other,int)==True or isinstance(other,float)==True):
+                raise TypeError
+            from fractions import gcd
+            num = self.x*other.y
+            denom = self.y*other.x
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+        except TypeError:
+            from fractions import gcd
+            if(isinstance(other,float)==True):
+                TEMP = Frac(other.as_integer_ratio()[0],other.as_integer_ratio()[1])
+            else:
+                TEMP = Frac(other,1)
+            num = self.x*TEMP.y
+            denom = self.y*TEMP.x
+            divisor = gcd(num,denom)
+            numerator = num/divisor
+            denominator = denom/divisor
+            if(numerator % denominator == 0):
+                intr = numerator/denominator
+                return Frac(intr,1)
+            else: 
+                return Frac(numerator,denominator)
+
+    def __rdiv__(self, other):             # int/frac
+        from fractions import gcd
+        if(isinstance(other,float)==True):
+            TEMP = Frac(other.as_integer_ratio()[0],other.as_integer_ratio()[1])
+        else:
+            TEMP = Frac(other,1)
+        num = TEMP.x*self.y
+        denom = TEMP.y*self.x
+        divisor = gcd(num,denom)
+        numerator = num/divisor
+        denominator = denom/divisor
+        if(numerator % denominator == 0):
+            intr = numerator/denominator
+            return Frac(intr,1)
+        else: 
+            return Frac(numerator,denominator)
+
+    def __pos__(self):        # +frac = (+1)*frac
+        if(self.x<0 and self.y<0):
+            return Frac(-self.x,-self.y)
+        else:
+            return self
+
+    def __neg__(self):          # -frac = (-1)*frac
+        return Frac(-self.x, self.y)
+
+    def __invert__(self):  # odwrotnosc: ~frac
+        return Frac(self.y, self.x)
+
+
+
+    def __float__(self):       # float(frac)
+        return self.x/float(self.y)
+
+import unittest
+class TestFrac(unittest.TestCase):
+
+    def setUp(self):
+        self.zero = Frac(0,1)
+
+    def test_print(self):
+        self.assertEqual(str(Frac(4,2)),"2")
+        self.assertEqual(repr(Frac(1,2)),"Frac(1,2)")
+
+    def test_add_frac(self):
+        self.assertEqual(Frac(1,2) + Frac(1,3), Frac(5,6))
+        self.assertEqual(Frac(1,2) + 3, Frac(7,2))
+        self.assertEqual(3 + Frac(1,3), Frac(10,3))
+        self.assertEqual(Frac(1,2) + 1.5 , Frac(2,1))
+        self.assertEqual(1.5 + Frac(1,3), Frac(11,6))
+
+    def test_sub_frac(self):
+        self.assertEqual(Frac(1,2) - Frac(1,3), Frac(1,6))
+        self.assertEqual(Frac(3,2) - 1, Frac(1,2))
+        self.assertEqual(1 - Frac(1,3), Frac(2,3))
+        self.assertEqual(Frac(5,2) - 1.5 , Frac(1,1))
+        self.assertEqual(1.5 - Frac(1,2), Frac(1,1))
+
+    def test_mul_frac(self):
+        self.assertEqual(Frac(1,2) * Frac(1,3), Frac(1,6))
+        self.assertEqual(Frac(3,2) * 2, Frac(6,2))
+        self.assertEqual(3 * Frac(1,3), Frac(1,1))
+        self.assertEqual(Frac(2,1) * 0.5 , Frac(1,1))
+        self.assertEqual(1.5 * Frac(1,2), Frac(3,4))
+
+    def test_div_frac(self):
+        self.assertEqual(Frac(1,2) / Frac(1,3), Frac(3,2))
+        self.assertEqual(Frac(6,2) / 2, Frac(3,2))
+        self.assertEqual(4 / Frac(1,3), Frac(12,1))
+        self.assertEqual(Frac(2,1) / 0.5 , Frac(4,1))
+        self.assertEqual(1.5 / Frac(1,2), Frac(6,2))
+
+    def test_pos(self):
+        self.assertEqual(+Frac(1,2),Frac(1,2))
+
+    def test_neg(self):
+        self.assertEqual(-Frac(1,2),Frac(-1,2))
+
+    def test_invert(self):
+        self.assertEqual(~Frac(1,2),Frac(2,1))
+
+    def test_cmp(self):
+        self.assertEqual(cmp(Frac(1,2), Frac(1,3)),1)
+
+    def test_float(self):
+        self.assertEqual(float(Frac(1,2)),0.5)
+
+if __name__ == "__main__":
+    unittest.main()     # wszystkie testy
