@@ -1,0 +1,185 @@
+Zad 9.4
+
+class Node:
+
+    def __init__(self, data=None, next=None):
+        self.data = data
+        self.next = next
+
+    def __str__(self):
+        return str(self.data)  
+
+class SingleList:
+
+    def __init__(self, *arguments):
+        self.length = 0         
+        self.head = None
+        self.tail = None
+        for item in arguments:
+            self.insert_head(item)
+
+    def is_empty(self):
+        return self.length == 0
+
+    def count(self):      
+        return self.length
+
+    def insert_head(self, data):    
+        node = Node(data)
+        if self.length == 0:
+            self.head = self.tail = node
+        else:                  
+            node.next = self.head
+            self.head = node
+        self.length = self.length + 1
+
+    def insert_tail(self, data):   
+        node = Node(data)
+        if self.length == 0:
+            self.head = self.tail = node
+        else:                  
+            self.tail.next = node
+            self.tail = node
+        self.length = self.length + 1
+
+    def remove_head(self):          
+        if self.length == 0:
+            raise Exception("pusta lista")
+        node = self.head
+        self.head = self.head.next
+        self.length = self.length - 1
+        if self.length == 0: 
+            self.tail = None
+        return node.data
+
+    def print_list(self):
+        node = Node()
+        node = self.head
+        while node:
+            print node
+            node = node.next
+
+    def reverse(self):
+        node = Node()
+        node = self.head
+        templist = SingleList()
+        while node:
+            templist.insert_head(node)
+            node = node.next
+        while (self.length is not 0):
+            self.remove_head()
+        node = templist.head
+        while node:
+            self.insert_tail(node) 
+            node = node.next 
+
+
+
+lista = SingleList()
+lista.insert_head(1)         
+lista.insert_head(2)        
+lista.insert_head(3)         
+lista.insert_head(4)        
+lista.insert_head(5)         
+lista.print_list()
+
+lista.reverse()
+
+lista.print_list()
+
+
+
+
+Zad 9.8
+
+class Node:
+
+    def __init__(self, data=None, left=None, right=None):
+        self.data = data
+        self.left = left
+        self.right = right
+
+    def __str__(self):
+        return str(self.data)
+
+    def insert(self, data):
+        if self.data < data:      # na prawo
+            if self.right:
+                self.right.insert(data)
+            else:
+                self.right = Node(data)
+        elif self.data > data:    # na lewo
+            if self.left:
+                self.left.insert(data)
+            else:
+                self.left = Node(data)
+        else:
+            pass    
+
+    def count(self):
+        counter = 1
+        if self.left:
+            counter += self.left.count()
+        if self.right:
+            counter += self.right.count()
+        return counter
+
+    def search(self, data):
+        if self.data == data:
+            return True
+        if data < self.data:
+            if self.left:
+                return self.left.search(data)
+        else:
+            if self.right:
+                return self.right.search(data)
+        return False
+
+def btree_print_indented(top, level=0):
+    if top is None:
+        return
+    btree_print_indented(top.right, level+1)
+    print "%s* %s" % ('   '*level, top)
+    btree_print_indented(top.left, level+1)
+
+def maxim(top):
+    if not top:
+        raise Exception("Empty tree")
+    count = top.data
+    if top.right:
+        count = max(maxim(top.right),count)
+    if top.left:
+        count = max(maxim(top.left),count)
+    return count
+
+def minim(top):
+    if not top:
+        raise Exception("Empty tree")
+    counter = top.data
+    if top.right:
+        counter = min(minim(top.right),counter)
+    if top.left:
+        counter = min(minim(top.left),counter)
+    return counter
+
+root = None
+
+try:
+    minim(None)
+except Exception:
+    print("puste drzewo")
+
+root = Node(2)
+root.left = Node(2)
+root.left.left = Node(1)
+root.left.left.left = Node(2)
+root.left.left.right = Node(2)
+root.right = Node(2)
+root.right.left = Node(4)
+root.right.right = Node(2)
+
+btree_print_indented(root)
+
+print "Minimalny element: "+str(minim(root))
+
+print "Maksymalny element: "+str(maxim(root))
