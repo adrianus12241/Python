@@ -1,0 +1,182 @@
+Zad 10.2
+
+
+
+class Stack:
+
+    def __init__(self, size=1):
+        self.items = size * [None]      
+        self.n = 0                      
+        self.size = size
+
+    def is_empty(self):
+        return self.n == 0
+
+    def is_full(self):
+        return self.size == self.n
+
+    def push(self, data):
+        if self.size == self.n:
+            raise Exception("stos pelny")
+        self.items[self.n] = data
+        self.n = self.n + 1
+
+    def pop(self):
+        if self.n == 0:
+            raise Exception("stos pusty")
+        self.n = self.n - 1
+        data = self.items[self.n]
+        self.items[self.n] = None   
+        return data
+
+import unittest
+class TestStack(unittest.TestCase):
+
+    def setUp(self):
+        self.zero = Stack()
+
+    def test_is_empty(self):
+        template = Stack()
+        self.assertEqual(template.is_empty(),True)
+
+    def test_is_full(self):
+        template = Stack()
+        self.assertEqual(template.is_full(),False)
+
+    def test_push(self):
+        template = Stack()
+        template.push(1)
+        with self.assertRaises(Exception):
+            template.push(1)
+
+    def test_pop(self):
+        template = Stack()
+        template.push(1)
+        self.assertEqual(template.pop(),1)
+        with self.assertRaises(Exception):
+            template.pop()
+
+if __name__ == "__main__":
+    unittest.main()     # wszystkie testy
+    
+    
+    
+    
+Zad 10.4
+
+
+
+class Queue:
+
+    def __init__(self, size=1):
+        self.n = size + 1        
+        self.items = self.n * [None] 
+        self.head = 0           
+        self.tail = 0           
+
+    def is_empty(self):
+        return self.head == self.tail
+
+    def is_full(self):
+        return (self.head + self.n-1) % self.n == self.tail
+
+    def put(self, data):
+        if ((self.head + self.n-1) % self.n == self.tail):
+            raise Exception("kolejka przepelniona")
+        self.items[self.tail] = data
+        self.tail = (self.tail + 1) % self.n
+
+    def get(self):
+        if self.head == self.tail:
+            raise Exception("kolejka pusta")
+        data = self.items[self.head]
+        self.items[self.head] = None      
+        self.head = (self.head + 1) % self.n
+        return data
+
+import unittest
+class TestQueue(unittest.TestCase):
+
+    def setUp(self):
+        self.zero = Queue()
+
+    def test_is_empty(self):
+        template = Queue()
+        self.assertEqual(template.is_empty(),True)
+
+    def test_is_full(self):
+        template = Queue()
+        self.assertEqual(template.is_full(),False)
+
+    def test_put(self):
+        template = Queue()
+        template.put(1)
+        with self.assertRaises(Exception):
+            template.put(1)
+
+    def test_get(self):
+        template = Queue()
+        template.put(1)
+        self.assertEqual(template.get(),1)
+        with self.assertRaises(Exception):
+            template.get()
+
+if __name__ == "__main__":
+    unittest.main()     # wszystkie testy
+    
+    
+    
+    
+    Zad 10.8
+    
+    
+    
+    from random import randint
+
+class Queue:
+
+    def __init__(self, size=10):
+        self.n = size + 1        
+        self.items = self.n * [None] 
+        self.head = 0           
+        self.tail = 0           
+
+    def is_empty(self):
+        return self.head == self.tail
+
+    def is_full(self):
+        return (self.head + self.n-1) % self.n == self.tail
+
+    def insert(self, item):
+        if ((self.head + self.n-1) % self.n == self.tail):
+            raise Exception("kolejka przepelniona")
+        self.items[self.tail] = item
+        self.tail = (self.tail + 1) % self.n
+
+    def remove(self):
+        if self.head == self.tail:
+            raise Exception("kolejka pusta")
+        first = self.head
+        last = self.tail
+        rand = randint(first,last)
+        data = self.items[rand]
+        self.items[rand] = None
+        rang = last - rand
+        for i in range(rang - 1):
+            self.items[rand] = self.items[rand+1] 
+            rand = rand + 1     
+        self.items[rand] = None
+        self.tail = (self.tail - 1) % self.n
+        return data
+
+temp = Queue()
+temp.insert(7)
+temp.insert(6)
+temp.insert(5)
+temp.insert(4)
+temp.insert(3)
+temp.insert(2)
+temp.insert(1)
+print temp.remove()
+print temp.remove()
+print temp.remove()
