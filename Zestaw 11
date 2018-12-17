@@ -1,0 +1,594 @@
+Zad 11.1
+
+
+
+import sys
+from random import randint
+from random import gauss
+from random import choice
+from math import ceil
+
+def randlist(N,LENGTH):
+    L = []
+    for i in range(LENGTH):
+        L.append(randint(0,N-1))
+    return L  
+  
+def almost_sortlist(N,LENGTH):
+    L = randlist(N,LENGTH)
+    L.sort()
+    R = ceil(LENGTH*0.05)
+    for i in range(int(R)):
+        number = randint(1,LENGTH - 2)
+        L[i], L[number] = L[number], L[i]
+    return L
+
+def reverse_almost_sortlist(N,LENGTH):
+    L = almost_sortlist(N,LENGTH)
+    L.reverse()
+    return L
+
+def gaussian_randlist(N,LENGTH):
+    L = []
+    med = N/2
+    for i in range(LENGTH):
+        L.append(int(gauss(med, med/3)))
+    return L
+
+def randelements(N,LENGTH,ELEM):
+    if (ELEM>1):
+        raise ValueError("dlugosc podzbioru(procentowa) musi byc mniejsza od dlugosci zbioru");
+    R = ceil(LENGTH*ELEM)
+    L = []
+    for i in range(int(R)):
+        L.append(randint(0,N))
+    #print "Elements: {}".format(L)
+    newL = []
+    for i in range(LENGTH):
+        newL.append(choice(L))
+    return newL
+
+def tester():                 
+    print "text"
+
+if __name__ == "__main__":
+    status = tester()
+    sys.exit(status)
+    
+    
+Zad 11.4
+
+
+import time
+from zad11_1 import *
+from zad11_4module import *
+
+La2 = randlist(1000,100)
+La3 = randlist(1000,1000)
+La4 = randlist(1000,10000)
+La5 = randlist(1000,100000)
+La6 = randlist(1000,1000000)
+
+Lb2 = almost_sortlist(1000,100)
+Lb3 = almost_sortlist(1000,1000)
+Lb4 = almost_sortlist(1000,10000)
+Lb5 = almost_sortlist(1000,100000)
+Lb6 = almost_sortlist(1000,1000000)
+
+Lc2 = reverse_almost_sortlist(1000,100)
+Lc3 = reverse_almost_sortlist(1000,1000)
+Lc4 = reverse_almost_sortlist(1000,10000)
+Lc5 = reverse_almost_sortlist(1000,100000)
+Lc6 = reverse_almost_sortlist(10000,1000000)
+
+Ld2 = gaussian_randlist(1000,100)
+Ld3 = gaussian_randlist(1000,1000)
+Ld4 = gaussian_randlist(1000,10000)
+Ld5 = gaussian_randlist(1000,100000)
+Ld6 = gaussian_randlist(1000,1000000)
+
+Le2 = randelements(1000,100,0.2)
+Le3 = randelements(1000,1000,0.2)
+Le4 = randelements(1000,10000,0.2)
+Le5 = randelements(1000,100000,0.2)
+Le6 = randelements(1000,1000000,0.2)
+
+def sortit(L,end):
+    print "----------------------------------------"
+    print "FOR {} ITEMS".format(end+1)
+    print "----------------------------------------"
+    print "SHELLSORT BY SEDGEWICK"
+    start8 = time.clock()
+    shellsort_Sedg(L,0,end)
+    end8 = time.clock() - start8
+    print "Time: {}".format(end8)
+    print "----------------------------------------"
+    print "MERGESORT"
+    start11 = time.clock()
+    mergesort(L,0,end)
+    end11 = time.clock() - start11
+    print "Time: {}".format(end11)
+    print "----------------------------------------"
+    print "MERGESORT WITH SENTRY"
+    start12 = time.clock()
+    mergesort_sentry(L,0,end)
+    end12 = time.clock() - start12
+    print "Time: {}".format(end12)
+    print "----------------------------------------"
+
+print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+print "RANDOM LIST"
+sortit(La2,99)
+sortit(La3,999)
+sortit(La4,9999)
+sortit(La5,99999)
+sortit(La6,999999)
+print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+print "ALMOST SORTED LIST"
+sortit(Lb2,99)
+sortit(Lb3,999)
+sortit(Lb4,9999)
+sortit(Lb5,99999)
+sortit(Lb6,999999)
+print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+print "ALMOST SORTED LIST REVERSE"
+sortit(Lc2,99)
+sortit(Lc3,999)
+sortit(Lc4,9999)
+sortit(Lc5,99999)
+sortit(Lc6,999999)
+print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+print "GAUSSIAN FUNCTION RANDOM LIST"
+sortit(Ld2,99)
+sortit(Ld3,999)
+sortit(Ld4,9999)
+sortit(Ld5,99999)
+sortit(Ld6,999999)
+print "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+print "LIST FROM NUMBERS IN SUBSET(SUBSET LENGHT = 20% of LIST LENGHT)"
+sortit(Le2,99)
+sortit(Le3,999)
+sortit(Le4,9999)
+sortit(Le5,99999)
+sortit(Le6,999999)
+
+
+
+11.4 module
+
+
+import sys
+
+def swap(L, i, j):
+    L[i], L[j] = L[j], L[i]
+
+def shakersort(L, left, right):
+    k = right
+    while left < right:
+        for j in range(right, left, -1):   # od prawej
+            if L[j-1] > L[j]:
+                swap(L, j-1, j)
+                k = j
+        left = k
+        for j in range(left, right):   # od lewej
+            if L[j] > L[j+1]:
+                swap(L, j, j+1)
+                k = j
+        right = k
+
+def shellsort_Sedg(L, left, right):
+    h = 1
+    while h <= (right-left) / 9:
+        h = 3*h+1
+    while h > 0:
+        for i in range(left+h, right+1):
+            j = i
+            item = L[i]
+            while j >= left+h and item < L[j-h]:
+                L[j] = L[j-h]
+                j = j-h
+            L[j] = item
+        h = h / 3
+
+def quicksort_KerRitch(L, left, right):
+    if left >= right:
+        return
+    swap(L, left, (left + right) / 2)
+    pivot = left
+    for i in range(left + 1, right + 1):
+        if L[i] < L[left]:
+            pivot = pivot + 1
+            swap(L, pivot, i)
+    swap(L, left, pivot)
+    quicksort_KerRitch(L, left, pivot - 1)
+    quicksort_KerRitch(L, pivot + 1, right)
+
+def mergesort(L, left, right):
+    if left < right:
+        middle = (left + right) / 2
+        mergesort(L, left, middle)
+        mergesort(L, middle + 1, right)
+        merge(L, left, middle, right)
+
+def mergesort_sentry(L, left, right):
+    if left < right:
+        middle = (left + right) / 2
+        mergesort_sentry(L, left, middle)
+        mergesort_sentry(L, middle + 1, right)
+        merge_sentry(L, left, middle, right)
+
+def merge(L, left, middle, right):
+    T = [None] * (right - left + 1)
+    left1 = left
+    right1 = middle
+    left2 = middle + 1
+    right2 = right
+    i = 0
+    while left1 <= right1 and left2 <= right2:
+        if L[left1] <= L[left2]:
+            T[i] = L[left1]
+            left1 += 1
+        else:
+            T[i] = L[left2]
+            left2 += 1
+        i += 1
+    while left1 <= right1:
+        T[i] = L[left1]
+        left1 += 1
+        i += 1
+    while left2 <= right2:
+        T[i] = L[left2]
+        left2 += 1
+        i += 1
+    for i in range(right - left +1):
+        L[left + i] = T[i]
+
+def merge_sentry(L, left, middle, right):
+    n1 = middle - left + 1
+    n2 = right - middle
+    A = [None] * (n1 + 1)
+    B = [None] * (n2 + 1)
+    for i in range(n1):
+        A[i] = L[left + i]
+    for i in range(n2):
+        B[i] = L[middle + 1 + i]
+    A[n1] = float("inf")
+    B[n2] = float("inf")
+    i, j = 0, 0
+    for k in range(left, right+1):
+        if A[i] <= B[j]:
+            L[k] = A[i]
+            i += 1
+        else:
+            L[k] = B[j]
+            j += 1
+
+def tester():                 
+    print "text"
+
+if __name__ == "__main__":
+    status = tester()
+    sys.exit(status)
+
+
+
+
+11.4 output
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+RANDOM LIST
+----------------------------------------
+FOR 100 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.00613042254798
+----------------------------------------
+MERGESORT
+Time: 0.0158155065692
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.0156187856503
+----------------------------------------
+----------------------------------------
+FOR 1000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.108908977231
+----------------------------------------
+MERGESORT
+Time: 0.204883554046
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.203723328278
+----------------------------------------
+----------------------------------------
+FOR 10000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 1.68781886964
+----------------------------------------
+MERGESORT
+Time: 2.55820544335
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 2.53113108541
+----------------------------------------
+----------------------------------------
+FOR 100000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 22.648172762
+----------------------------------------
+MERGESORT
+Time: 30.3821894012
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 29.9219377182
+----------------------------------------
+----------------------------------------
+FOR 1000000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 315.170116125
+----------------------------------------
+MERGESORT
+Time: 353.175461375
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 345.98081971
+----------------------------------------
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ALMOST SORTED LIST
+----------------------------------------
+FOR 100 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.00459215049318
+----------------------------------------
+MERGESORT
+Time: 0.0159215648036
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.0157753070771
+----------------------------------------
+----------------------------------------
+FOR 1000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.0811281345982
+----------------------------------------
+MERGESORT
+Time: 0.202798312306
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.20471591361
+----------------------------------------
+----------------------------------------
+FOR 10000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 1.27972987652
+----------------------------------------
+MERGESORT
+Time: 2.54363996993
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 2.53259237972
+----------------------------------------
+----------------------------------------
+FOR 100000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 17.1677913971
+----------------------------------------
+MERGESORT
+Time: 30.370284792
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 29.9227793416
+----------------------------------------
+----------------------------------------
+FOR 1000000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 219.497689385
+----------------------------------------
+MERGESORT
+Time: 356.258637117
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 348.340923767
+----------------------------------------
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ALMOST SORTED LIST REVERSE
+----------------------------------------
+FOR 100 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.00633783482135
+----------------------------------------
+MERGESORT
+Time: 0.0162820772703
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.0161046007888
+----------------------------------------
+----------------------------------------
+FOR 1000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.101218044611
+----------------------------------------
+MERGESORT
+Time: 0.204352835219
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.217235061826
+----------------------------------------
+----------------------------------------
+FOR 10000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 1.42517805381
+----------------------------------------
+MERGESORT
+Time: 2.54790282671
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 2.51275991751
+----------------------------------------
+----------------------------------------
+FOR 100000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 18.5427769638
+----------------------------------------
+MERGESORT
+Time: 30.3757502123
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 29.9794465129
+----------------------------------------
+----------------------------------------
+FOR 1000000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 303.681527649
+----------------------------------------
+MERGESORT
+Time: 355.962974129
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 349.018730397
+----------------------------------------
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+GAUSSIAN FUNCTION RANDOM LIST
+----------------------------------------
+FOR 100 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.00703320050388
+----------------------------------------
+MERGESORT
+Time: 0.0159536388669
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.0163804377298
+----------------------------------------
+----------------------------------------
+FOR 1000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.112840402029
+----------------------------------------
+MERGESORT
+Time: 0.20812260674
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.203837511942
+----------------------------------------
+----------------------------------------
+FOR 10000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 1.69494529876
+----------------------------------------
+MERGESORT
+Time: 2.56338732895
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 2.53866079241
+----------------------------------------
+----------------------------------------
+FOR 100000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 23.2598627743
+----------------------------------------
+MERGESORT
+Time: 30.9283251609
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 30.2320763722
+----------------------------------------
+----------------------------------------
+FOR 1000000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 297.781269004
+----------------------------------------
+MERGESORT
+Time: 356.387794664
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 349.619566547
+----------------------------------------
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+LIST FROM NUMBERS IN SUBSET(SUBSET LENGHT = 20% of LIST LENGHT)
+----------------------------------------
+FOR 100 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.00596278211287
+----------------------------------------
+MERGESORT
+Time: 0.0164595537508
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.0167182845253
+----------------------------------------
+----------------------------------------
+FOR 1000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 0.0997199720487
+----------------------------------------
+MERGESORT
+Time: 0.208483546861
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 0.207595736802
+----------------------------------------
+----------------------------------------
+FOR 10000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 1.79480212014
+----------------------------------------
+MERGESORT
+Time: 2.56579587724
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 2.52946494476
+----------------------------------------
+----------------------------------------
+FOR 100000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 23.9250198218
+----------------------------------------
+MERGESORT
+Time: 30.4927863294
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 30.0057421126
+----------------------------------------
+----------------------------------------
+FOR 1000000 ITEMS
+----------------------------------------
+SHELLSORT BY SEDGEWICK
+Time: 323.297867973
+----------------------------------------
+MERGESORT
+Time: 354.269700531
+----------------------------------------
+MERGESORT WITH SENTRY
+Time: 345.914948994
+----------------------------------------
+
+
+
+
+
+
