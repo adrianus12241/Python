@@ -1,0 +1,47 @@
+Zad 12.3
+
+
+def mediana_sort(L, left, right):
+    T = []
+    T = L[left:right]
+    T.sort()
+    s = len(T)
+    if(s%2 == 0):
+        sr = (T[s/2] + T[(s/2)+1])/2
+        return sr
+    else:
+        return T[s/2]
+
+
+
+L = [ 2, 1, 6, 6, 8, 9, 3, 4, 55, 1, 28, 111, 4]
+L.sort()
+print L
+print mediana_sort(L, 0, len(L))
+LL = [ 4, 8 ,1, 6, 2, 2, 14, 12]
+print mediana_sort(LL, 0, len(LL))
+
+
+
+
+
+
+
+Zad 12.2
+
+
+def binarne_rek(L, left, right, y):
+    if(left == right):
+        return L[left] == y
+    else:
+        median = (left + right)/2
+        if L[median] == y:
+            return True
+        elif L[median] > y:
+            return binarne_rek(L, left, median, y)
+        else:
+            return binarne_rek(L, median+1, right, y)
+
+L = [ 2, 1, 6, 6, 8, 9, 3, 4, 55, 1, 28, 111, 4]
+print binarne_rek(L,0,len(L)-1,3)
+
