@@ -1,0 +1,114 @@
+Zad 13.1
+
+
+import sys, time
+from random import randint
+
+print "Problem skoczka"
+print "Program ma wysoka zlozonosc obliczeniowa"
+
+boardsize = -1
+board = []
+ntime = 0  
+    
+x = -1 
+y = -1 
+ 
+def main():
+	global boardsize,board,ntime,x,y
+
+	if(boardsize == -1):
+		boardsize = 6
+	print "Bok szachownicy: {}".format(boardsize)
+
+	if(x == -1):
+		x = randint(0,boardsize-1)
+
+	if(y == -1):
+		y = randint(0,boardsize-1)
+
+	print "Start z pola: x = {} y = {}".format(x+1,y+1)
+
+	for i in range(0, boardsize):
+		board.append(boardsize*[0])
+
+	sys.stdout.write("... ")
+
+	ntime = time.strftime("%S")
+	move(y, x, 1)
+
+	print("Nie znaleziono rozwiazania")
+
+def move(y,x,count):
+	assert board[y][x] == 0
+	board[y][x] = count
+	if count == boardsize*boardsize:
+		draw()          
+		sys.exit(1)
+	moves = ((-2,1),(-1,2),(1,2),(2,1),(2,-1),(1,-2),(-1,-2),(-2,-1))
+	for i in moves:
+		ty,tx = y+i[0],x+i[1]
+		if(goodpos(ty,tx)):
+			move(ty,tx,count+1)
+	board[y][x] = 0
+
+def goodpos(ty,tx):
+	return ty>=0 and tx>=0 and ty<boardsize and tx<boardsize and board[ty][tx] == 0
+
+def draw():
+	global ntime 
+	t = time.strftime("%S")
+	diff = int(t)-int(ntime)
+	print "{}s".format(diff)
+	l = len(str(boardsize*boardsize))
+	print(boardsize*("|" + l*"=") + "|")
+	for line in board:
+		for column in line:
+			sys.stdout.write("|%*d" % (l,column))
+		print("|\n"+boardsize*("|" + l*"=") + "|")
+
+if __name__ == "__main__":
+	main()
+  
+  
+  
+  Zad 13.2
+  
+  
+  def danger(row, column, queens):
+    if(not len(queens)): return False
+    for queen in queens:
+        if(not len(queen)):
+            continue
+        a,b = queen
+        if(a == row): 
+            return True
+        if(b == column):
+            return True
+        if((column-b) == (row-a)): 
+            return True
+        if (column-b) == -(row-a): 
+            return True
+    return False
+
+def solve(solved, i, n):
+    L = []
+    for x in range(1, n+1):
+        if(not solved or not len(solved)):
+            L.append([] + [(i, x)])
+        else:
+            for queen in solved:
+                if(not danger(i, x, queen)):
+                    L.append(queen + [(i, x)])
+    return L
+
+input = raw_input("Podaj dlugosc boku szachownicy: ")
+n = int(input)
+
+solved = None
+for i in range(1, n+1):
+    solved = solve(solved, i, n)
+
+print "Liczba rozwiazan dla boku rownego {} to {}".format(n,len(solved))
+print "Dokladne pozycje na szachownicy:"
+print solved
